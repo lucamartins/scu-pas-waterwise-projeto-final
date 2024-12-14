@@ -23,7 +23,7 @@ class CommandService:
         water_system = WaterSystem(
             name=water_system_req.name,
             location=water_system_req.location,
-            capacity=water_system_req.capacity,
+            capacityCubicMeters=water_system_req.capacity,
             system_type=water_system_req.system_type,
             sensors=water_system_req.sensors,
         )

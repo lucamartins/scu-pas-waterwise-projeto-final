@@ -16,10 +16,10 @@ class WaterSystem(BaseModel):
     id: str = Field(None, description="Identificador único do gêmeo digital")
     name: str = Field(..., description="Nome do sistema físico representado")
     location: Optional[str] = Field(None, description="Localização do sistema físico")
-    capacity: Optional[float] = Field(None, description="Capacidade total (em litros ou metros cúbicos)")
+    capacityCubicMeters: Optional[float] = Field(None, description="Capacidade total (em litros ou metros cúbicos)")
     system_type: WaterSystemType = Field(..., description="Tipo do sistema físico (ex.: reservatório, tratamento)")
-    sensors: List[WaterSystemSensor] = Field(default_factory=lambda: list, description="Lista de sensores atrelados")
     status: str = Field("online", description="Estado atual do sistema (online/offline/manutenção)")
+    sensors: List[WaterSystemSensor] = Field(default_factory=lambda: list, description="Lista de sensores atrelados")
 
     # Simulação e Interatividade
     def add_sensor(self, sensor: WaterSystemSensor):

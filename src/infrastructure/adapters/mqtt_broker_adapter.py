@@ -1,6 +1,8 @@
 from typing import Callable, Any
-from pydantic import BaseModel, Field
+
 import paho.mqtt.client as mqtt
+import paho.mqtt.enums as mqtt_enums
+from pydantic import BaseModel, Field
 
 from src.logging_config import get_custom_logger
 
@@ -19,7 +21,7 @@ class MQTTBrokerAdapter:
         """
         self.logger = get_custom_logger("MQTTBrokerAdapter")
         self.config = config
-        self.client = mqtt.Client(self.config.client_id)
+        self.client = mqtt.Client(mqtt_enums.CallbackAPIVersion(2))
 
         # Dicionário para armazenar handlers associados a tópicos
         self.handlers = {}
@@ -29,7 +31,7 @@ class MQTTBrokerAdapter:
         self.client.on_message = self._on_message
         self.client.on_disconnect = self._on_disconnect
 
-    def _on_connect(self, client, userdata, flags, rc):
+    def _on_connect(self, client, userdata, flags, rc, properties):
         """Callback chamado ao conectar ao broker."""
         if rc == 0:
             self.logger.info("Conectado ao broker com sucesso!")
