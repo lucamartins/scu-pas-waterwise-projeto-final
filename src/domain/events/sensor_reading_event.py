@@ -7,14 +7,17 @@ from src.domain.entities.water_system_sensor import SensorType, MeasureUnit
 
 
 class SensorReadingEvent(BaseModel):
+    id: str = Field(None)
     sensor: SensorType = Field(...)
     value: float = Field(...)
     measure_unit: MeasureUnit = Field(MeasureUnit.NONE)
-    create_date: datetime = Field(...)
-    sensor_id: UUID = Field(None)
+    create_date: datetime = Field(..., validation_alias="createDate")
+    sensor_id: str = Field(None, validation_alias="sensorId")
+    water_system_id: str = Field("675e068d883edb78ee614cf2", validation_alias="waterSystemId")
 
+    @classmethod
     @field_validator("measure_unit", mode="after", check_fields=True)
-    def validate_measure_unit(self, unit, values):
+    def validate_measure_unit(cls, unit, values):
         sensor = values.get("sensor")
         if sensor:
             sensor_units = {

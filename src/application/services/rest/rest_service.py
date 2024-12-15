@@ -1,20 +1,15 @@
 from fastapi import Depends, HTTPException
 
-from src.application.services.command.command_dtos import WaterSystemCreateUpdateRequest
+from src.application.services.rest.rest_service_dtos import WaterSystemCreateUpdateRequest
 from src.domain.entities.water_system import WaterSystem
 from src.domain.repositories.water_system_repository import WaterSystemRepository
-from src.infrastructure.adapters.mongodb_adapter import MongoDBAdapter
-from src.infrastructure.config.env_config import EnvEntry, EnvConfig
 
 
 def get_repository() -> WaterSystemRepository:
-    env_config = EnvConfig()
-    adapter = MongoDBAdapter(env_config.get(EnvEntry.MONGODB_CONNECTION_STRING), env_config.get(EnvEntry.MONGODB_DATABASE_NAME))
-    db = adapter.get_database()
-    return WaterSystemRepository(db)
+    return WaterSystemRepository()
 
 
-class CommandService:
+class RestService:
     @staticmethod
     async def create_water_system(
             water_system_req: WaterSystemCreateUpdateRequest, repository: WaterSystemRepository = Depends(get_repository)

@@ -4,12 +4,16 @@ from bson import ObjectId
 
 from src.application.utils.object_util import ObjectUtil
 from src.domain.entities.water_system import WaterSystem
+from src.infrastructure.adapters.mongodb_adapter import MongoDBAdapter
+from src.infrastructure.config.env_config import EnvConfig, EnvEntry
 
 
 class WaterSystemRepository:
-    def __init__(self, db):
-        """Initialize the repository with the MongoDB database instance."""
-        self.collection = db["waterSystems"]
+    def __init__(self):
+        env_config = EnvConfig()
+        collection_name = env_config.get(EnvEntry.MONGODB_WATER_SYSTEMS_COLLECTION)
+        db = MongoDBAdapter().get_database()
+        self.collection = db[collection_name]
 
     async def create_water_system(self, water_system: WaterSystem) -> str:
         """Insert a new WaterSystem into the database."""

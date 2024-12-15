@@ -2,13 +2,13 @@ from typing import List
 
 from fastapi import APIRouter
 
-from src.application.services.command.command_service import CommandService
+from src.application.services.rest.rest_service import RestService
 from src.domain.entities.water_system import WaterSystem
 
 
 class RestController:
     def __init__(self):
-        command_service = CommandService()
+        command_service = RestService()
         self.router = APIRouter()
         self.router.post("", response_model=str)(command_service.create_water_system)
         self.router.get("/{water_system_id}", response_model=WaterSystem)(command_service.get_water_system)

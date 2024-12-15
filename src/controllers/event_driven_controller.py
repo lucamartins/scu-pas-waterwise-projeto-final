@@ -1,18 +1,35 @@
+import asyncio
+
+from src.application.services.event.event_service import EventService
+from src.domain.events.sensor_reading_event import SensorReadingEvent
 from src.infrastructure.adapters.mqtt_broker_adapter import MQTTBrokerAdapter, MQTTConfig
+from src.infrastructure.config.env_config import EnvConfig, EnvEntry
 from src.logging_config import get_custom_logger
 
 
 class EventDrivenController:
     def __init__(self):
-        mqtt_config = MQTTConfig(broker_url="localhost", broker_port=1883, client_id="1")
+        env_config = EnvConfig()
+        mqtt_config = MQTTConfig(
+            broker_url=env_config.get(EnvEntry.MQTT_BROKER_URL),
+            broker_port=int(env_config.get(EnvEntry.MQTT_BROKER_PORT)),
+            client_id=env_config.get(EnvEntry.MQTT_BROKER_CLIENT_ID)
+        )
         self.mqtt_broker = MQTTBrokerAdapter(mqtt_config)
+        self.mqtt_broker.set_event_loop(asyncio.get_event_loop())
         self.logger = get_custom_logger("EventDrivenController")
+        self.event_service = EventService()
 
-    def _handler(self, topic: str, payload: str):
-        self.logger.info(f"Received message on topic {topic}: {payload}")
+    async def _handler(self, topic: str, payload: str):
+        self.logger.info(f"Handling new message on topic {topic}")
+        try:
+            sensor_reading_event = SensorReadingEvent.model_validate_json(payload)
+            await self.event_service.process_sensor_reading(sensor_reading_event)
+        except Exception as e:
+            self.logger.error(f"Error when handling event: {e}")
 
     def start(self):
-        self.mqtt_broker.register_handler("waterwise/temperature", self._handler)
+        self.mqtt_broker.register_handler("waterwise/+", self._handler)
         self.mqtt_broker.connect()
         self.mqtt_broker.start()
 
