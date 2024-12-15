@@ -21,6 +21,7 @@ class RestService:
             capacityCubicMeters=water_system_req.capacity,
             system_type=water_system_req.system_type,
             sensors=water_system_req.sensors,
+            twinning_rate_seconds=water_system_req.twinning_rate_seconds
         )
         water_system_id = await repository.create_water_system(water_system)
         return water_system_id

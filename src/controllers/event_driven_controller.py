@@ -1,6 +1,5 @@
 import asyncio
 import json
-from datetime import datetime, timezone
 
 from src.application.services.event.event_service import EventService
 from src.domain.events.sensor_reading_event import SensorReadingEvent
@@ -25,7 +24,6 @@ class EventDrivenController:
     async def _handler(self, topic: str, payload: str):
         try:
             payload_dict = json.loads(payload)
-            payload_dict["createDate"] = datetime.now(timezone.utc)
             sensor_reading_event = SensorReadingEvent.model_validate(payload_dict)
             await self.event_service.process_sensor_reading(sensor_reading_event)
         except Exception as e:

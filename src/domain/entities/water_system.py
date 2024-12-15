@@ -19,8 +19,8 @@ class WaterSystem(BaseModel):
     capacityCubicMeters: Optional[float] = Field(None, description="Capacidade total (em litros ou metros cúbicos)")
     system_type: WaterSystemType = Field(..., description="Tipo do sistema físico (ex.: reservatório, tratamento)")
     status: str = Field("online", description="Estado atual do sistema (online/offline/manutenção)")
-    sensors: List[WaterSystemSensor] = Field(default_factory=lambda: list, description="Lista de sensores atrelados")
     twinning_rate_seconds: int = Field(60, description="Intervalo de sincronização com o sistema físico (em segundos)")
+    sensors: List[WaterSystemSensor] = Field(default_factory=lambda: list, description="Lista de sensores atrelados")
 
     @classmethod
     @field_validator("twinning_rate_seconds", mode="after", check_fields=True)
