@@ -12,10 +12,10 @@ task_scheduler = AsyncIOScheduler()
 @asynccontextmanager
 async def lifespan(app_instance: FastAPI):
     edc = EventDrivenController()
-    edc.start()
-
     processing_pipeline_service = ProcessingPipelineService()
+
     task_scheduler.add_job(processing_pipeline_service.run, "interval", seconds=60)
+    task_scheduler.add_job(edc.start)
     task_scheduler.start()
     try:
         yield
@@ -26,4 +26,3 @@ async def lifespan(app_instance: FastAPI):
 app = FastAPI(lifespan=lifespan)
 rest_controller = RestController()
 app.include_router(rest_controller.router, prefix="/water-systems", tags=["Water Systems"])
-
