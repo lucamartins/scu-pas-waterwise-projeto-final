@@ -1,6 +1,8 @@
 import asyncio
 import json
 
+from tenacity import retry, wait_fixed
+
 from src.application.services.event.event_service import EventService
 from src.domain.events.sensor_reading_event import SensorReadingEvent
 from src.infrastructure.adapters.mqtt_broker_adapter import MQTTBrokerAdapter, MQTTConfig
@@ -29,10 +31,16 @@ class EventDrivenController:
         except Exception as e:
             self.logger.error(f"Error when handling event: {e}")
 
+    @retry(wait=wait_fixed(60))
     def start(self):
-        self.mqtt_broker.register_handler("waterwise/+", self._handler)
-        self.mqtt_broker.connect()
-        self.mqtt_broker.start()
+        try:
+            self.mqtt_broker.register_handler("waterwise/+", self._handler)
+            self.mqtt_broker.connect()
+            self.mqtt_broker.start()
+        except Exception as e:
+            self.logger.error(f"Error when starting MQTT Broker: {e}")
+            self.logger.error("Retrying in 60 seconds...")
+            raise
 
     def stop(self):
         self.mqtt_broker.stop()

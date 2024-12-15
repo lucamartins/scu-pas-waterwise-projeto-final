@@ -15,7 +15,7 @@ async def lifespan(app_instance: FastAPI):
     edc.start()
 
     processing_pipeline_service = ProcessingPipelineService()
-    task_scheduler.add_job(processing_pipeline_service.run, "interval", seconds=15)
+    task_scheduler.add_job(processing_pipeline_service.run, "interval", seconds=60)
     task_scheduler.start()
     try:
         yield

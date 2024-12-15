@@ -60,7 +60,7 @@ class MQTTBrokerAdapter:
         if not matched:
             self.logger.warning(f"Received message with no related handler on topic {msg.topic}: {msg.payload.decode()}")
 
-    def _on_disconnect(self, client, userdata, rc):
+    def _on_disconnect(self, client, userdata, df, rc, p):
         """Callback chamado ao desconectar do broker."""
         self.logger.info("Desconectado do broker MQTT.")
 
