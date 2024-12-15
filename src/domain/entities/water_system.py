@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from src.domain.entities.water_system_sensor import WaterSystemSensor
 
@@ -20,6 +20,14 @@ class WaterSystem(BaseModel):
     system_type: WaterSystemType = Field(..., description="Tipo do sistema físico (ex.: reservatório, tratamento)")
     status: str = Field("online", description="Estado atual do sistema (online/offline/manutenção)")
     sensors: List[WaterSystemSensor] = Field(default_factory=lambda: list, description="Lista de sensores atrelados")
+    twinning_rate_seconds: int = Field(60, description="Intervalo de sincronização com o sistema físico (em segundos)")
+
+    @classmethod
+    @field_validator("twinning_rate_seconds", mode="after", check_fields=True)
+    def validate_measure_unit(cls, twinning_rate_seconds, values):
+        if twinning_rate_seconds < 60:
+            raise ValueError("Twinning rate must be at least 60.")
+        return twinning_rate_seconds
 
     # Simulação e Interatividade
     def add_sensor(self, sensor: WaterSystemSensor):

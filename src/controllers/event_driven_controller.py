@@ -1,4 +1,6 @@
 import asyncio
+import json
+from datetime import datetime, timezone
 
 from src.application.services.event.event_service import EventService
 from src.domain.events.sensor_reading_event import SensorReadingEvent
@@ -17,13 +19,14 @@ class EventDrivenController:
         )
         self.mqtt_broker = MQTTBrokerAdapter(mqtt_config)
         self.mqtt_broker.set_event_loop(asyncio.get_event_loop())
-        self.logger = get_custom_logger("EventDrivenController")
+        self.logger = get_custom_logger(EventDrivenController.__name__)
         self.event_service = EventService()
 
     async def _handler(self, topic: str, payload: str):
-        self.logger.info(f"Handling new message on topic {topic}")
         try:
-            sensor_reading_event = SensorReadingEvent.model_validate_json(payload)
+            payload_dict = json.loads(payload)
+            payload_dict["createDate"] = datetime.now(timezone.utc)
+            sensor_reading_event = SensorReadingEvent.model_validate(payload_dict)
             await self.event_service.process_sensor_reading(sensor_reading_event)
         except Exception as e:
             self.logger.error(f"Error when handling event: {e}")

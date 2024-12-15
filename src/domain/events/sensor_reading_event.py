@@ -1,5 +1,4 @@
 from datetime import datetime
-from uuid import UUID
 
 from pydantic import BaseModel, field_validator, Field
 
@@ -10,10 +9,10 @@ class SensorReadingEvent(BaseModel):
     id: str = Field(None)
     sensor: SensorType = Field(...)
     value: float = Field(...)
-    measure_unit: MeasureUnit = Field(MeasureUnit.NONE)
+    measure_unit: MeasureUnit = Field(MeasureUnit.NONE, validation_alias="measureUnit")
     create_date: datetime = Field(..., validation_alias="createDate")
     sensor_id: str = Field(None, validation_alias="sensorId")
-    water_system_id: str = Field("675e068d883edb78ee614cf2", validation_alias="waterSystemId")
+    water_system_id: str = Field(None, validation_alias="waterSystemId")
 
     @classmethod
     @field_validator("measure_unit", mode="after", check_fields=True)
@@ -33,3 +32,7 @@ class SensorReadingEvent(BaseModel):
                     f"Invalid measure unit '{unit}' for sensor type '{sensor}'. Expected: '{expected_unit}'."
                 )
         return unit
+
+    class Config:
+        allow_population_by_field_name = True
+        populate_by_name = True

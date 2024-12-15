@@ -12,7 +12,7 @@ class MongoDBAdapter:
         env_config = EnvConfig()
         conn_str = env_config.get(EnvEntry.MONGODB_CONNECTION_STRING)
         db_name = env_config.get(EnvEntry.MONGODB_DATABASE_NAME)
-        self._client = AsyncIOMotorClient(conn_str)
+        self._client = AsyncIOMotorClient(conn_str, tz_aware=True)
         self._database = self._client[db_name]
 
     def get_database(self) -> AsyncIOMotorDatabase[Any]:

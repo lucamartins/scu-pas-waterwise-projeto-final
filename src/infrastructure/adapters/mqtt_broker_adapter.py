@@ -20,7 +20,7 @@ class MQTTBrokerAdapter:
         Inicializa o adaptador MQTT.
         :param config: Configuração para o MQTT.
         """
-        self.logger = get_custom_logger("MQTTBrokerAdapter")
+        self.logger = get_custom_logger(MQTTBrokerAdapter.__name__)
         self.config = config
         self.client = mqtt.Client(mqtt_enums.CallbackAPIVersion(2))
 
@@ -46,13 +46,12 @@ class MQTTBrokerAdapter:
 
     def _on_message(self, client, userdata, msg):
         """Callback chamado quando uma mensagem é recebida."""
-        self.logger.info(f"New message received on topic {msg.topic}: {msg.payload.decode()}")
+        self.logger.info(f"New message received on topic {msg.topic}")
         matched = False
         for pattern, handler in self.handlers.items():
             if self.matches_topic(pattern, msg.topic):
                 try:
                     asyncio.run_coroutine_threadsafe(handler(msg.topic, msg.payload.decode()), self.event_loop)
-                    self.logger.info("Message sent to be processed by event loop")
                 except Exception as e:
                     self.logger.error(f"Failure when sending message from MQTT thread to event loop: {e}")
                 matched = True

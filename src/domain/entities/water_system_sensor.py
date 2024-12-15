@@ -25,7 +25,11 @@ class WaterSystemSensor(BaseModel):
     sensor_id: str = Field(..., description="Identificador único do sensor", min_length=1)
     sensor_type: SensorType = Field(..., description="Tipo do sensor (ex.: pH, temperatura)")
     unit: MeasureUnit = Field(..., description="Unidade de medida (ex.: °C, ppm)")
-    last_value: Optional[float] = Field(None, description="Último valor registrado pelo sensor")
+    mean_value: Optional[float] = Field(None, description="Valor médio do sensor dentro intervalo de twinning")
+    min_value: Optional[float] = Field(None, description="Valor mínimo registrado pelo sensor dentro do intervalo de twinning")
+    max_value: Optional[float] = Field(None, description="Valor máximo registrado pelo sensor dentro do intervalo de twinning")
+    last_value: Optional[float] = Field(None, description="Último valor registrado pelo sensor dentro intervalo de twinning")
+    last_value_date: Optional[datetime] = Field(None, description="Data/hora do último valor registrado")
     last_updated: Optional[datetime] = Field(None, description="Data/hora da última atualização")
 
     def update_value(self, value: float):
